@@ -24,7 +24,7 @@
                             ]
                         },
                         ":",
-                        "3000"
+                        "8080"
                     ]
                 ]
             }
@@ -38,9 +38,40 @@
         }
     },
     "Resources": {
+        "InstanceProfile": {
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "Role"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::InstanceProfile"
+        },
+        "Role": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "Type": "AWS::IAM::Role"
+        },
         "SecurityGroup": {
             "Properties": {
-                "GroupDescription": "Allow SSH and TCP/3000 access",
+                "GroupDescription": "Allow SSH and TCP/8080 access",
                 "SecurityGroupIngress": [
                     {
                         "CidrIp": "62.165.150.44/32",
@@ -50,9 +81,9 @@
                     },
                     {
                         "CidrIp": "0.0.0.0/0",
-                        "FromPort": "3000",
+                        "FromPort": "8080",
                         "IpProtocol": "tcp",
-                        "ToPort": "3000"
+                        "ToPort": "8080"
                     }
                 ],
                 "VpcId": "vpc-57ca2b31"
@@ -61,14 +92,14 @@
         },
         "instance": {
             "Properties": {
+                "IamInstanceProfile": {
+                    "Ref": "InstanceProfile"
+                },
                 "ImageId": "ami-d834aba1",
                 "InstanceType": "t2.micro",
                 "KeyName": {
                     "Ref": "KeyPair"
                 },
-                "SecurityGroupIds": [
-                    "sg-8b9f79f1"
-                ],
                 "SubnetId": "subnet-576c240c",
                 "UserData": {
                     "Fn::Base64": {
@@ -78,8 +109,8 @@
                                 "#!/bin/bash",
                                 "yum install --enablerepo=epel -y git",
                                 "pip install ansible",
-                                "/usr/local/bin/ansible-pull -U https://github.com/hassanbasri/ansible helloworld.yml -i localhost",
-                                "echo '*/10 * * * * /usr/local/bin/ansible-pull -U https://github.com/hassanbasri/ansible helloworld.yml -i localhost' > /etc/cron.d/ansible-pull",
+                                "/usr/local/bin/ansible-pull -U https://github.com/hassanbasri/ansible jenkins.yml -i localhost",
+                                "echo '*/10 * * * * /usr/local/bin/ansible-pull -U https://github.com/hassanbasri/ansible jenkins.yml -i localhost' > /etc/cron.d/ansible-pull",
                                 "crontab /etc/cron.d/ansible-pull"
                             ]
                         ]

@@ -13,9 +13,24 @@ from troposphere import (
     Ref,
     Template,
 )
+from troposphere.iam import ( 
+    InstanceProfile, 
+    PolicyType as IAMPolicy, 
+    Role,  
+) 
+ 
+from awacs.aws import ( 
+    Action, 
+    Allow, 
+    Policy, 
+    Principal, 
+    Statement, 
+) 
+ 
+from awacs.sts import AssumeRole 
 
-ApplicationName = "helloworld"
-ApplicationPort = "3000"
+ApplicationName = "jenkins"
+ApplicationPort = "8080"
 
 GithubAccount = "hassanbasri"
 GithubAnsibleURL = "https://github.com/{}/ansible".format(GithubAccount)
@@ -37,6 +52,24 @@ t.add_parameter(Parameter(
     Description="Name of an existing EC2 KeyPair to SSH",
     Type="AWS::EC2::KeyPair::KeyName",
     ConstraintDescription="must be the name of an existing EC2 KeyPair.",
+))
+t.add_resource(Role(
+    "Role",
+    AssumeRolePolicyDocument=Policy(
+        Statement=[
+            Statement(
+                Effect=Allow,
+                Action=[AssumeRole],
+                Principal=Principal("Service", ["ec2.amazonaws.com"])
+            )
+        ]
+    )
+))
+
+t.add_resource(InstanceProfile( 
+    "InstanceProfile", 
+    Path="/", 
+    Roles=[Ref("Role")] 
 ))
 
 t.add_resource(ec2.SecurityGroup(
@@ -72,9 +105,10 @@ t.add_resource(ec2.Instance(
     "instance",
     ImageId="ami-d834aba1",
     InstanceType="t2.micro",
-    SecurityGroupIds=["sg-8b9f79f1"],
+    SecurityGroupIds=["sg-63fa1c19"],
     SubnetId="subnet-576c240c",
     KeyName=Ref("KeyPair"),
+    IamInstanceProfile=Ref("InstanceProfile"),
     UserData=ud,
 ))
 
