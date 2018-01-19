@@ -100,9 +100,6 @@
                 "KeyName": {
                     "Ref": "KeyPair"
                 },
-                "SecurityGroupIds": [
-                    "sg-68fd1b12"
-                ],
                 "SubnetId": "subnet-576c240c",
                 "UserData": {
                     "Fn::Base64": {

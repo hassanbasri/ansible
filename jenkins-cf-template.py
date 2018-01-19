@@ -105,7 +105,7 @@ t.add_resource(ec2.Instance(
     "instance",
     ImageId="ami-d834aba1",
     InstanceType="t2.micro",
-    SecurityGroupIds=["sg-68fd1b12"],
+    #SecurityGroupIds=["sg-68fd1b12"],
     SubnetId="subnet-576c240c",
     KeyName=Ref("KeyPair"),
     IamInstanceProfile=Ref("InstanceProfile"),

@@ -13,7 +13,7 @@
     gpgcheck: yes
 - name: Install Jenkins 
   yum: 
-    name: jenkins 
+    name: jenkins-2.45 
     enablerepo: jenkins 
     state: present
 - name: Start Jenkins 
